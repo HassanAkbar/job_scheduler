@@ -1,0 +1,2 @@
+class SelfDependencyError < StandardError
+end
