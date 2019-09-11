@@ -41,14 +41,33 @@ class Scheduler
   def execution_sequence
     resultant_sequence = []
     @jobs.each do |job_name, job|
-      
+      # If the Job is already in the sequence then ignore it
+      next if resultant_sequence.include?(job_name)
+
       if job.independent?
         resultant_sequence.unshift(job_name)
       else
         # We need to get all dependent Jobs in order
         # and update the resultant sequence
+        resolve_job_dependence(job, resultant_sequence)
       end
     end
     resultant_sequence
+  end
+
+  def resolve_job_dependence(job, resultant_sequence)
+
+    if resultant_sequence.include?(job.dependent_job)
+      # if the dependent job is already in the sequence we need to
+      # just place this before job.dependent_job
+      dependent_job_position = resultant_sequence.find_index(job.dependent_job)
+      resultant_sequence.insert(dependent_job_position + 1, job.name)
+    else
+      resultant_sequence << job.name
+      until job.independent?
+        resultant_sequence.unshift(job.dependent_job)
+        job = @jobs[job.dependent_job]
+      end
+    end
   end
 end
