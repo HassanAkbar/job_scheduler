@@ -56,6 +56,7 @@ class Scheduler
   end
 
   def resolve_job_dependence(job, resultant_sequence)
+    raise SelfDependencyError if job.name == job.dependent_job
 
     if resultant_sequence.include?(job.dependent_job)
       # if the dependent job is already in the sequence we need to

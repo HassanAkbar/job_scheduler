@@ -1,4 +1,5 @@
 require_relative '../lib/scheduler'
+require_relative '../lib/self_dependency_error'
 
 describe "#execution_sequence" do
   context 'without any job' do
@@ -64,6 +65,17 @@ describe "#execution_sequence" do
       expect(result.find_index('f')).to be < result.find_index('c')
       expect(result.find_index('a')).to be < result.find_index('d')
       expect(result.find_index('b')).to be < result.find_index('e')
+    end
+  end
+
+  context 'with self dependency' do
+    it 'gives error for Self dependent jobs' do
+      scheduler = Scheduler.new(
+        'a =>
+        b =>
+        c => c'
+      )
+      expect{ scheduler.execution_sequence }.to raise_error(SelfDependencyError)
     end
   end
 end
