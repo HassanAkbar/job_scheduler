@@ -41,7 +41,13 @@ class Scheduler
   def execution_sequence
     resultant_sequence = []
     @jobs.each do |job_name, job|
-      #TODO find jobs sequence
+      
+      if job.independent?
+        resultant_sequence.unshift(job_name)
+      else
+        # We need to get all dependent Jobs in order
+        # and update the resultant sequence
+      end
     end
     resultant_sequence
   end

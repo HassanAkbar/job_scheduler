@@ -6,4 +6,8 @@ class Job
     @name = name
     @dependent_job = dependent_job
   end
+
+  def independent?
+    @dependent_job.nil?
+  end
 end
