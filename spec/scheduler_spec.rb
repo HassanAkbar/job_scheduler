@@ -1,5 +1,6 @@
 require_relative '../lib/scheduler'
 require_relative '../lib/self_dependency_error'
+require_relative '../lib/circular_dependency_error'
 
 describe "#execution_sequence" do
   context 'without any job' do
@@ -68,7 +69,7 @@ describe "#execution_sequence" do
     end
   end
 
-  context 'with self dependency' do
+  context 'with self or circular dependency' do
     it 'gives error for Self dependent jobs' do
       scheduler = Scheduler.new(
         'a =>
@@ -76,6 +77,18 @@ describe "#execution_sequence" do
         c => c'
       )
       expect{ scheduler.execution_sequence }.to raise_error(SelfDependencyError)
+    end
+
+    it 'gives error for circular dependent jobs' do
+      scheduler = Scheduler.new(
+        'a =>
+        b => c
+        c => f
+        d => a
+        e =>
+        f => b'
+      )
+      expect{ scheduler.execution_sequence }.to raise_error(CircularDependencyError)
     end
   end
 end

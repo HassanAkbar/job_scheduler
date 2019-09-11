@@ -64,8 +64,13 @@ class Scheduler
       dependent_job_position = resultant_sequence.find_index(job.dependent_job)
       resultant_sequence.insert(dependent_job_position + 1, job.name)
     else
+      # Maintain an array of job visited to keep track of circular dependency
+      jobs_traversed = [job.name]
       resultant_sequence << job.name
       until job.independent?
+        # Get Dependent Jobs Till the Job is not dependent on any
+        raise CircularDependencyError if jobs_traversed.include?(job.dependent_job)
+
         resultant_sequence.unshift(job.dependent_job)
         job = @jobs[job.dependent_job]
       end
